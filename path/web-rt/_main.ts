@@ -1,29 +1,29 @@
-import { ImageCanvas } from './lib/image_canvas'
-import { Color } from './lib/color'
+// import { ImageCanvas } from "./lib/image_canvas";
+// import { Color } from "./lib/color";
 // import { HittableList } from "./lib/hittable.js";
 // import Camera from "./lib/camera.js";
 // import Sphere from "./lib/sphere.js";
 // import Ray from "./lib/ray.js";
 
-const canvasElm = document.getElementById('canvas') as HTMLCanvasElement
-let image = ImageCanvas(canvasElm)
+// const canvasElm = document.getElementById('canvas') as HTMLCanvasElement
+// let image = ImageCanvas(canvasElm)
 
 // Image
 // const aspectRatio = imageWidth / imageHeight;
 // const samplesPerPixel = 1;
 // const maxDepth = 16;
 
-for (let j = 0; j < image.height; j++) {
-    for (let i = 0; i < image.width; i++) {
-        let r = i / (image.width - 1)
-        let g = j / (image.height - 1)
-        let b = 0.0
+// for (let j = 0; j < image.height; j++) {
+//     for (let i = 0; i < image.width; i++) {
+//         let r = i / (image.width - 1)
+//         let g = j / (image.height - 1)
+//         let b = 0.0
 
-        image.write(i, j, new Color(r, g, b))
-    }
-}
+//         image.write(i, j, new Color(r, g, b))
+//     }
+// }
 
-image.display()
+// image.display()
 
 // // World
 // let world = HittableList();
