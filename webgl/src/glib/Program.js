@@ -1,7 +1,12 @@
+let ID = 1
+
 export class Program {
     constructor(gl, vertSrc, fragSrc) {
         if (!gl.canvas) console.error('gl not passed as first argument to Program')
         this.gl = gl
+        this.id = ID++
+
+        this.uniforms = {}
 
         // create empty shaders and attach to program
         this.vertexShader = gl.createShader(gl.VERTEX_SHADER)
@@ -60,7 +65,7 @@ export class Program {
     use() {
         this.gl.useProgram(this.program)
 
-        // TODO: is the program in charge of activating uniforms?
+        // update uniforms
     }
 
     remove() {

@@ -11,11 +11,13 @@ let ID = 1
 let ATTR_ID = 1
 
 export class Geometry {
-    constructor(gl, attributes = {}) {
+    constructor(gl, drawCount, attributes = {}) {
         if (!gl.canvas) console.error('gl not passed as first argument to Geometry')
         this.gl = gl
         this.attributes = attributes
         this.id = ID++
+
+        this.drawCount = drawCount
 
         // create the buffers
         for (let key in attributes) {
@@ -62,10 +64,8 @@ export class Geometry {
         }
     }
 
-    draw({ program, mode = this.gl.TRIANGLES }) {
-        console.log('TODO: render geometry')
-        this.gl.drawArrays(this.gl.TRIANGLES, 0, 3)
-        // this.gl.drawArrays(this.gl.TRIANGLES, 0, this.attributes.position.data.length / this.attributes.position.size)
+    draw({ mode = this.gl.TRIANGLES }) {
+        this.gl.drawArrays(mode, 0, this.drawCount)
     }
 
     remove() {

@@ -41,7 +41,7 @@ function init() {
         0.0, 0.0, 1.0, 1.0
     ])
     // note: key (i.e. 'a_position') needs to match shader attribute name
-    const geometry = new Geometry(gl, {
+    const geometry = new Geometry(gl, 3, {
         a_position: { size: 2, data: positions },
         a_color: { size: 4, data: colors },
     })
@@ -55,21 +55,13 @@ function init() {
     function render(now) {
         const time = now * 0.001 // in milliseconds
 
-        // // update uniforms - rotate the triangle
-        // const cosTheta = Math.cos(time)
-        // const sinTheta = Math.sin(time)
-        // // prettier-ignore
-        // // UPDATE for new program stack
-        // // program.uniforms.u_model.value = ...
-        // gl.uniformMatrix2fv(modelUniformLocation, false, [
-        //     cosTheta, sinTheta,
-        //     -sinTheta, cosTheta,
-        // ])
-
         // A MESH loads the program, geometry, and uniforms
         renderer.render({ scene: mesh })
 
-        // requestAnimationFrame(render)
+        // TODO: this needs to be done in Program
+        gl.uniform1f(program.uniformLocations.get('u_time'), time)
+
+        requestAnimationFrame(render)
     }
     requestAnimationFrame(render)
 }

@@ -23,9 +23,7 @@ export class Mesh {
         // for each attribute we created a buffer for (Geometry)
         for (let key in this.geometry.attributes) {
             const attr = this.geometry.attributes[key]
-
             const attribLocation = this.gl.getAttribLocation(program.program, key)
-            console.log('Attrib location', attribLocation, key)
 
             // describe and enable the position attribute
             this.gl.bindBuffer(attr.target, attr.buffer)
@@ -41,7 +39,7 @@ export class Mesh {
         // mesh is in charge of binding the VAO
         this.gl.bindVertexArray(this.vao)
 
-        this.geometry.draw({ mode: this.mode, program: this.program })
+        this.geometry.draw({ mode: this.mode })
 
         // unbind the VAO just in case
         this.gl.bindVertexArray(null)
