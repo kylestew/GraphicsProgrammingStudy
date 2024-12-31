@@ -5,7 +5,7 @@
 in vec2 a_position;
 in vec4 a_color;
 
-uniform mat2 u_model;
+// uniform mat2 u_model;
 
 out vec4 v_color;
 
@@ -13,7 +13,8 @@ out vec4 v_color;
 void main() {
     // Convert 2D position to 4d (homogeneous coordinates)
     // gl_Position is a special variable a vertex shader is responsible for setting
-    gl_Position = vec4(u_model * a_position, 0.0, 1.0);
+    // gl_Position = vec4(u_model * a_position, 0.0, 1.0);
+    gl_Position = vec4(a_position, 0.0, 1.0);
 
     v_color = a_color;
 }
