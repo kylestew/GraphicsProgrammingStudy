@@ -23,7 +23,13 @@ function init() {
     resize()
 
     // 2: Create Program
-    const program = new Program(gl, vertexSource, fragmentSource)
+    const program = new Program(gl, {
+        vertex: vertexSource,
+        fragment: fragmentSource,
+        // uniforms: {
+        //     uTime: { value: 0 },
+        // },
+    })
     console.log('Program created successfully', program)
 
     // 3: Create Geometry
@@ -40,10 +46,10 @@ function init() {
         0.0, 1.0, 0.0, 1.0,
         0.0, 0.0, 1.0, 1.0
     ])
-    // note: key (i.e. 'a_position') needs to match shader attribute name
+    // note: key (i.e. 'aPosition') needs to match shader attribute name
     const geometry = new Geometry(gl, 3, {
-        a_position: { size: 2, data: positions },
-        a_color: { size: 4, data: colors },
+        aPosition: { size: 2, data: positions },
+        aColor: { size: 4, data: colors },
     })
     console.log('Geometry created successfully', geometry)
 
@@ -51,15 +57,13 @@ function init() {
     let mesh = new Mesh(gl, { geometry, program })
     console.log('Mesh created successfully', mesh)
 
-    // 6: Render Loop
+    // 5: Render Loop
     function render(now) {
         const time = now * 0.001 // in milliseconds
+        program.setUniform('uTime', time)
 
         // A MESH loads the program, geometry, and uniforms
         renderer.render({ scene: mesh })
-
-        // TODO: this needs to be done in Program
-        gl.uniform1f(program.uniformLocations.get('u_time'), time)
 
         requestAnimationFrame(render)
     }

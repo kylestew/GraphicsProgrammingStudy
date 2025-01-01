@@ -1,12 +1,11 @@
 let ID = 1
 
 export class Program {
-    constructor(gl, vertSrc, fragSrc) {
+    constructor(gl, { vertex, fragment, uniforms = {} }) {
         if (!gl.canvas) console.error('gl not passed as first argument to Program')
         this.gl = gl
         this.id = ID++
-
-        this.uniforms = {}
+        this.uniforms = uniforms
 
         // create empty shaders and attach to program
         this.vertexShader = gl.createShader(gl.VERTEX_SHADER)
@@ -15,7 +14,7 @@ export class Program {
         gl.attachShader(this.program, this.vertexShader)
         gl.attachShader(this.program, this.fragmentShader)
 
-        this.setShaders(vertSrc, fragSrc)
+        this.setShaders(vertex, fragment)
     }
 
     setShaders(vertSrc, fragSrc) {
@@ -47,7 +46,7 @@ export class Program {
         let numUniforms = this.gl.getProgramParameter(this.program, this.gl.ACTIVE_UNIFORMS)
         for (let uIndex = 0; uIndex < numUniforms; uIndex++) {
             let uniform = this.gl.getActiveUniform(this.program, uIndex)
-            this.uniformLocations.set(uniform.name, this.gl.getUniformLocation(this.program, uniform.name))
+            this.uniformLocations.set(uniform, this.gl.getUniformLocation(this.program, uniform.name))
         }
 
         // get active attribute locations
@@ -62,16 +61,57 @@ export class Program {
         }
     }
 
+    setUniform(name, value) {
+        this.uniforms[name] = value
+    }
+
     use() {
         this.gl.useProgram(this.program)
 
-        // update uniforms
+        // Update uniforms
+        this.uniformLocations.forEach((location, activeUniform) => {
+            const uniform = this.uniforms[activeUniform.name]
+
+            if (uniform === undefined) {
+                console.warn(`Uniform "${activeUniform.name}" has no value set.`)
+                return
+            }
+
+            // Handle different uniform types
+            setUniform(this.gl, activeUniform.type, location, uniform)
+        })
     }
 
     remove() {
         this.gl.deleteShader(this.vertexShader)
         this.gl.deleteShader(this.fragmentShader)
         this.gl.deleteProgram(this.program)
+    }
+}
+
+function setUniform(gl, type, location, value) {
+    switch (type) {
+        case gl.FLOAT:
+            gl.uniform1f(location, value)
+            break
+        case gl.FLOAT_VEC2:
+            gl.uniform2fv(location, value)
+            break
+        case gl.FLOAT_VEC3:
+            gl.uniform3fv(location, value)
+            break
+        case gl.FLOAT_VEC4:
+            gl.uniform4fv(location, value)
+            break
+        case gl.SAMPLER_2D:
+            gl.uniform1i(location, value)
+            break
+        case gl.SAMPLER_2D_ARRAY:
+            gl.uniform1iv(location, value)
+            break
+        // Add other cases as needed
+        default:
+            console.error(`Unhandled uniform type: ${type}`)
     }
 }
 

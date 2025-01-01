@@ -58,12 +58,12 @@ function init() {
     console.log('Program created successfully', program)
 
     // gather attribute and uniform locations
-    const positionAttribLocation = gl.getAttribLocation(program, 'a_position')
+    const positionAttribLocation = gl.getAttribLocation(program, 'aPosition')
     console.log('Position attribute location', positionAttribLocation)
-    const colorAttribLocation = gl.getAttribLocation(program, 'a_color')
+    const colorAttribLocation = gl.getAttribLocation(program, 'aColor')
     console.log('Color attribute location', colorAttribLocation)
-    const modelUniformLocation = gl.getUniformLocation(program, 'u_model')
-    console.log('Model uniform location', modelUniformLocation)
+    const timeUniformLocation = gl.getUniformLocation(program, 'uTime')
+    console.log('Time uniform location', timeUniformLocation)
 
     // == VAOs and Buffers ==
     // Data for the GPU pipeline is stored in Buffers
@@ -89,6 +89,7 @@ function init() {
     ])
 
     // combine positions and colors into single array before uploading to GPU
+    // NOTE: this doesn't have to be a single buffer
     // prettier-ignore
     const combinedData = new Float32Array([
         positions[0], positions[1], colors[0], colors[1], colors[2], colors[3],
@@ -144,13 +145,7 @@ function init() {
         gl.bindVertexArray(vao)
 
         // update uniforms - rotate the triangle
-        const cosTheta = Math.cos(time)
-        const sinTheta = Math.sin(time)
-        // prettier-ignore
-        gl.uniformMatrix2fv(modelUniformLocation, false, [
-            cosTheta, sinTheta,
-            -sinTheta, cosTheta,
-        ])
+        gl.uniform1f(timeUniformLocation, time)
 
         // draw the triangle
         gl.drawArrays(gl.TRIANGLES, 0, 3)
