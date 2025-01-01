@@ -14,6 +14,8 @@ function createImageCanvas(): ImageCanvas {
         throw new Error('Failed to get 2D context')
     }
 
+    ctx.imageSmoothingEnabled = false
+
     // Create an ImageData object of the same size as the canvas
     let imageData = ctx.createImageData(canvas.width, canvas.height)
 
