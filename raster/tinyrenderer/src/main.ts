@@ -1,62 +1,20 @@
 import { Color, ImageCanvas, createImageCanvas } from './image'
-// import { line, Vec2 } from './line'
+import { line, Vec2 } from './line'
 // import { readModelFromRaw } from './model_reader'
 
 // import fileContents from './model/african_head/african_head.obj?raw'
-
-function line(x0: number, y0: number, x1: number, y1: number, image: ImageCanvas, color: Color) {
-    // setup for optimal drawing scenario where algo works in all cases
-    // (1) if line is steep, we transpose the image (otherwise we would have to draw along y-axis)
-    let steep = false
-    if (Math.abs(x0 - x1) < Math.abs(y0 - y1)) {
-        // flip vertically
-        // TODO: confused about this
-        ;[x0, y0, x1, y1] = [y0, x0, y1, x1]
-        steep = true
-    }
-    // (2) make sure we always draw left to right (for simplicity)
-    if (x0 > x1) {
-        // swap points
-        ;[x0, y0, x1, y1] = [x1, y1, x0, y0]
-    }
-
-    const dx = x1 - x0
-    const dy = y1 - y0
-    const derror = Math.abs(dy / dx)
-    let error = 0
-    let y = y0
-    for (let x = x0; x <= x1; x++) {
-        // // how far in the line are we given our x-value
-        // let t = (x - x0) / (x1 - x0)
-        // // lerp y value
-        // let y = y0 * (1.0 - t) + y1 * t
-        if (steep) {
-            image.set(y, x, color) // de-transpose value
-        } else {
-            image.set(x, y, color)
-        }
-
-        // each time error is greater than one pixel, we increase y by
-        // one and decrease error by one
-        error += derror
-        if (error > 0.5) {
-            y += y1 > y0 ? 1 : -1
-            error -= 1
-        }
-    }
-}
 
 const image = createImageCanvas()
 
 const red: Color = [255, 0, 0, 255]
 const white: Color = [255, 255, 255, 255]
 
-line(13, 20, 80, 40, image, white) // horiz, small slope
-line(20, 13, 40, 80, image, red) // horiz, large slope
-line(80, 40, 13, 20, image, red) // draw over first line, but red
-line(90, 10, 90, 80, image, white) // vertical line
-line(13, 80, 70, 10, image, white) // negative slope
-line(80, 40, 17, 21.2, image, red) // should write over top of the first line
+line([13, 20], [80, 40], image, white) // horiz, small slope
+line([20, 13], [40, 80], image, red) // horiz, large slope
+line([80, 40], [13, 20], image, red) // draw over first line, but red
+line([90, 10], [90, 80], image, white) // vertical line
+line([13, 80], [70, 10], image, white) // negative slope
+line([80, 40], [17, 21.2], image, red) // should write over top of the first line
 
 image.display()
 
