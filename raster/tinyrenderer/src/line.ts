@@ -38,7 +38,6 @@ export function line(t0: Vec2, t1: Vec2, image: ImageCanvas, color: Color) {
     // we can get rid of floating points by replacing the error variable and assume its
     // equal to error * dx * 2
     let derror2 = Math.trunc(Math.abs(dy) * 2)
-    console.log('is this floating?', derror2)
     let error2 = 0
 
     // draw horizontal, left-to-right
