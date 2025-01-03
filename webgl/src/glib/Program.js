@@ -22,7 +22,7 @@ export class Program {
         this.gl.compileShader(this.vertexShader)
         let success = this.gl.getShaderParameter(this.vertexShader, this.gl.COMPILE_STATUS)
         if (!success) {
-            console.error(`${this.gl.getShaderInfoLog(this.vertexShader)}\nVertex Shader\n${addLineNumbers(vertex)}`)
+            console.error(`${this.gl.getShaderInfoLog(this.vertexShader)}\nVertex Shader\n${addLineNumbers(vertSrc)}`)
         }
 
         this.gl.shaderSource(this.fragmentShader, fragSrc)

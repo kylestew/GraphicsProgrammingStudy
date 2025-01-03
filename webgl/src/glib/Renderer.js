@@ -30,11 +30,14 @@ export class Renderer {
         this.gl.viewport(0, 0, width, height)
     }
 
-    render({ scene }) {
+    render({ scene, update = true }) {
         this.setViewport(this.width * this.dpr, this.height * this.dpr)
 
         this.gl.clearColor(0.0, 0.0, 0.0, 1.0)
         this.gl.clear(this.gl.COLOR_BUFFER_BIT)
+
+        // updates all scene graph matrices
+        if (update) scene.updateMatrixWorld()
 
         // TODO: get list of renderables
         // for now just render the scene directly

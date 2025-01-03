@@ -14,7 +14,7 @@ export class Geometry {
     constructor(gl, drawCount, attributes = {}) {
         if (!gl.canvas) console.error('gl not passed as first argument to Geometry')
         this.gl = gl
-        this.attributes = attributes
+        this.attributes = {}
         this.id = ID++
 
         this.drawCount = drawCount
@@ -23,12 +23,11 @@ export class Geometry {
         for (let key in attributes) {
             this.addAttribute(key, attributes[key])
         }
+
+        console.log('Geometry Created', this.drawCount, this.attributes, this.indexAttribute)
     }
 
     addAttribute(key, attr) {
-        this.attributes[key] = attr
-
-        // set options that describe the mesh
         attr.id = ATTR_ID++
         attr.size = attr.size || 1
         attr.type =
@@ -38,7 +37,7 @@ export class Geometry {
                 : attr.data.constructor === Uint16Array
                 ? this.gl.UNSIGNED_SHORT
                 : this.gl.UNSIGNED_INT) // Uint32Array
-        attr.target = key === 'index' ? this.gl.ELEMENT_ARRAY_BUFFER : this.gl.ARRAY_BUFFER
+        attr.target = attr.target || key === 'index' ? this.gl.ELEMENT_ARRAY_BUFFER : this.gl.ARRAY_BUFFER
         attr.normalized = attr.normalized || false
 
         attr.stride = attr.stride || 0
@@ -46,9 +45,19 @@ export class Geometry {
 
         attr.usage = attr.usage || this.gl.STATIC_DRAW
 
-        if (!attr.buffer) {
-            // push data to buffer
-            this.updateAttribute(attr)
+        attr.needsUpdate = false
+
+        if (key === 'index') {
+            // store for later update - VAO needs to be bound before uploading to GL buffer
+            attr.needsUpdate = true
+            this.indexAttribute = attr
+        } else {
+            this.attributes[key] = attr
+
+            if (!attr.buffer) {
+                // push data to buffer
+                this.updateAttribute(attr)
+            }
         }
     }
 
@@ -59,13 +68,28 @@ export class Geometry {
 
         if (isNewBuffer) {
             this.gl.bufferData(attr.target, attr.data, attr.usage)
+            console.log(
+                'Binding Buffer',
+                attr.target == this.gl.ARRAY_BUFFER ? 'ARRAY_BUFFER' : 'ELEMENT_ARRAY_BUFFER',
+                attr.data.length,
+                attr.data.constructor
+            )
         } else {
             console.error('buffer already exist, use .bufferSubData() instead')
         }
+        attr.needsUpdate = false
     }
 
     draw({ mode = this.gl.TRIANGLES }) {
-        this.gl.drawArrays(mode, 0, this.drawCount)
+        if (this.indexAttribute) {
+            console.log('index based drawing')
+            if (this.indexAttribute.needsUpdate) {
+                this.updateAttribute(this.indexAttribute)
+            }
+            this.gl.drawElements(mode, this.drawCount, this.gl.UNSIGNED_SHORT, 0)
+        } else {
+            this.gl.drawArrays(mode, 0, this.drawCount)
+        }
     }
 
     remove() {
