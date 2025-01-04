@@ -67,8 +67,8 @@ function createImageCanvas(): ImageCanvas {
     }
 
     // Function to display the ImageData object on the canvas
-    function display(): void {
-        flipVertically()
+    function display(flipped = true): void {
+        if (flipped) flipVertically()
         if (ctx) {
             ctx.putImageData(imageData, 0, 0)
         }

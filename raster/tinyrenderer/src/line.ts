@@ -1,6 +1,5 @@
 import { Color, ImageCanvas } from './image'
-
-export type Vec2 = [number, number]
+import { Vec2 } from './vector'
 
 /*
  * Breshenham's line algorithm is a way to determing which points on a grid should
