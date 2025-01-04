@@ -14,14 +14,9 @@ This example rebuilds the previous example using our custom framework
 
 ## 03-Transformations
 
-TODO: indexed rendering of BOX mesh/geometry
-
-03: Transformations - [rotate a cube, scale it, non-perspective]
-
-Goal: Implement and apply translation, rotation, and scaling to objects using transformation matrices. Learn to manage these transformations in both 2D and 3D contexts.
+Using transformation matrices, a piece of geometry is rotated, scaled, and translated in 3D.
 
 https://learnopengl.com/Getting-started/Transformations
-
 
 ## 04-Cameras
 

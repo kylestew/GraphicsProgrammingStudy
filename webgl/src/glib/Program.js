@@ -77,7 +77,6 @@ export class Program {
                 return
             }
 
-            // Handle different uniform types
             setUniform(this.gl, activeUniform.type, location, uniform)
         })
     }
@@ -90,6 +89,7 @@ export class Program {
 }
 
 function setUniform(gl, type, location, value) {
+    // https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Constants#uniform_types
     switch (type) {
         case gl.FLOAT:
             gl.uniform1f(location, value)
@@ -109,6 +109,13 @@ function setUniform(gl, type, location, value) {
         case gl.SAMPLER_2D_ARRAY:
             gl.uniform1iv(location, value)
             break
+        case gl.FLOAT_MAT2:
+            return gl.uniformMatrix2fv(location, false, value)
+        case gl.FLOAT_MAT3:
+            return gl.uniformMatrix3fv(location, false, value)
+        case gl.FLOAT_MAT4:
+            return gl.uniformMatrix4fv(location, false, value)
+
         // Add other cases as needed
         default:
             console.error(`Unhandled uniform type: ${type}`)
