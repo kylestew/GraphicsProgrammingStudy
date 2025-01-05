@@ -1,5 +1,5 @@
-import vertexSource from './shaders/basic.vert?raw'
-import fragmentSource from './shaders/basic.frag?raw'
+import vertexSource from './shaders/vertex_color.vert?raw'
+import fragmentSource from './shaders/vertex_color.frag?raw'
 
 function compileShader(gl, source, type) {
     const shader = gl.createShader(type)
@@ -58,7 +58,7 @@ function init() {
     console.log('Program created successfully', program)
 
     // gather attribute and uniform locations
-    const positionAttribLocation = gl.getAttribLocation(program, 'aPosition')
+    const positionAttribLocation = gl.getAttribLocation(program, 'position') // standard 'position' for library use
     console.log('Position attribute location', positionAttribLocation)
     const colorAttribLocation = gl.getAttribLocation(program, 'aColor')
     console.log('Color attribute location', colorAttribLocation)

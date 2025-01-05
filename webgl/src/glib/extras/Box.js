@@ -35,7 +35,7 @@ export class Box extends Geometry {
 
         // extend current attributes with new position and index data
         Object.assign(attributes, {
-            aPosition: { size: 3, data: positions },
+            position: { size: 3, data: positions },
             index: { data: indices }, // index treated as ELEMENT_ARRAY_BUFFER by Geometry
         })
 

@@ -3,8 +3,8 @@ import { Program } from './glib/Program.js'
 import { Geometry } from './glib/Geometry.js'
 import { Mesh } from './glib/Mesh.js'
 
-import vertexSource from './shaders/basic.vert?raw'
-import fragmentSource from './shaders/basic.frag?raw'
+import vertexSource from './shaders/vertex_color.vert?raw'
+import fragmentSource from './shaders/vertex_color.frag?raw'
 
 function init() {
     // 1: Setup Renderer
@@ -47,8 +47,8 @@ function init() {
         0.0, 0.0, 1.0, 1.0
     ])
     // note: key (i.e. 'aPosition') needs to match shader attribute name
-    const geometry = new Geometry(gl, 3, {
-        aPosition: { size: 2, data: positions },
+    const geometry = new Geometry(gl, {
+        position: { size: 2, data: positions },
         aColor: { size: 4, data: colors },
     })
     console.log('Geometry created successfully', geometry)

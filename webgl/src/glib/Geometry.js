@@ -11,17 +11,23 @@ let ID = 1
 let ATTR_ID = 1
 
 export class Geometry {
-    constructor(gl, drawCount, attributes = {}) {
+    constructor(gl, attributes = {}) {
         if (!gl.canvas) console.error('gl not passed as first argument to Geometry')
         this.gl = gl
         this.attributes = {}
         this.id = ID++
 
-        this.drawCount = drawCount
-
         // create the buffers
         for (let key in attributes) {
             this.addAttribute(key, attributes[key])
+        }
+
+        // try to infer the element draw count
+        this.drawCount = 0
+        if (this.indexAttribute) {
+            this.drawCount = this.indexAttribute.count
+        } else if (this.attributes.position) {
+            this.drawCount = this.attributes.position.count
         }
 
         console.log('Geometry Created', this.drawCount, this.attributes, this.indexAttribute)
@@ -42,6 +48,7 @@ export class Geometry {
 
         attr.stride = attr.stride || 0
         attr.offset = attr.offset || 0
+        attr.count = attr.count || attr.data.length / attr.size
 
         attr.usage = attr.usage || this.gl.STATIC_DRAW
 
@@ -80,7 +87,15 @@ export class Geometry {
         attr.needsUpdate = false
     }
 
+    setDrawCount(count) {
+        this.drawCount = count
+    }
+
     draw({ mode = this.gl.TRIANGLES }) {
+        if (this.drawCount <= 0) {
+            console.warn('No elements to draw for', this)
+        }
+
         if (this.indexAttribute) {
             console.log('index based drawing')
             if (this.indexAttribute.needsUpdate) {
