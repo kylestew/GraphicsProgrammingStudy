@@ -4,19 +4,19 @@ export class Plane extends Geometry {
     constructor(gl, { width = 1, height = 1, attributes = {} } = {}) {
         // determine length of arrays
         const num = 4
-        const numIndices = 12
+        // const numIndices = 12
 
         const position = new Float32Array(num * 3)
-        // const normal = new Float32Array(num * 3)
-        // const uv = new Float32Array(num * 2)
-        // const index = ...
-        Plane.buildSimplePlane(position, width, height)
+        const normal = new Float32Array(num * 3)
+        const uv = new Float32Array(num * 2)
+        const index = new Uint16Array(6)
+        Plane.buildSimplePlane(position, normal, uv, index, width, height)
 
         Object.assign(attributes, {
             position: { size: 3, data: position },
             // normal: { size: 3, data: normal },
-            // uv: { size: 2, data: uv },
-            // index: { data: index },
+            uv: { size: 2, data: uv },
+            index: { data: index },
         })
 
         super(gl, attributes)
@@ -61,6 +61,22 @@ export class Plane extends Geometry {
             position[i * 3 + u] = x * uDir
             position[i * 3 + v] = y * vDir
             position[i * 3 + w] = 0
+
+            // set the vertex normal
+            normal[i * 3 + u] = 0
+            normal[i * 3 + v] = 0
+            normal[i * 3 + w] = 1
+
+            // set the texture coordinate (UV mapping)
+            uv[i * 2] = (x + halfWidth) / width
+            uv[i * 2 + 1] = 1 - (y + halfHeight) / height
         }
+
+        index[0] = 0
+        index[0] = 1
+        index[2] = 2
+        index[3] = 0
+        index[4] = 2
+        index[5] = 3
     }
 }

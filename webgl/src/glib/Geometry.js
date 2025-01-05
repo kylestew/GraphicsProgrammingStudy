@@ -30,7 +30,7 @@ export class Geometry {
             this.drawCount = this.attributes.position.count
         }
 
-        console.log('Geometry Created', this.drawCount, this.attributes, this.indexAttribute)
+        console.log('Geometry Created', this.drawCount, this.attributes, 'indexed?', this.indexAttribute)
     }
 
     addAttribute(key, attr) {
@@ -77,6 +77,7 @@ export class Geometry {
             this.gl.bufferData(attr.target, attr.data, attr.usage)
             console.log(
                 'Binding Buffer',
+                attr.id,
                 attr.target == this.gl.ARRAY_BUFFER ? 'ARRAY_BUFFER' : 'ELEMENT_ARRAY_BUFFER',
                 attr.data.length,
                 attr.data.constructor
@@ -94,10 +95,10 @@ export class Geometry {
     draw({ mode = this.gl.TRIANGLES }) {
         if (this.drawCount <= 0) {
             console.warn('No elements to draw for', this)
+            return
         }
 
         if (this.indexAttribute) {
-            console.log('index based drawing')
             if (this.indexAttribute.needsUpdate) {
                 this.updateAttribute(this.indexAttribute)
             }

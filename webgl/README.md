@@ -37,6 +37,8 @@ This viewing box a projection matrix creates is called a frustum and each coordi
 Need to enable z-buffer depth test
 
 
+https://www.youtube.com/watch?v=gQiD2Kd6xoE&list=PLplnkTzzqsZS3R5DjmCQsqupu43oS9CFN&index=2
+
 
 https://webgl2fundamentals.org/webgl/lessons/webgl-3d-perspective.html
 https://webgl2fundamentals.org/webgl/lessons/webgl-3d-camera.html
