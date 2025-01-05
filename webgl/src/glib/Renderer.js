@@ -1,16 +1,24 @@
 // https://github.com/oframe/ogl/blob/master/src/core/Renderer.js
 
 export class Renderer {
-    constructor({ canvas = document.createElement('canvas'), width = 800, height = 600, dpr = 1 } = {}) {
-        const attributes = {}
+    constructor({
+        canvas = document.createElement('canvas'),
+        width = 800,
+        height = 600,
+        dpr = 1,
+        alpha = false,
+        depth = true,
+    } = {}) {
+        const attributes = { alpha, depth }
+        this.dpr = dpr
+        this.alpha = alpha
+        this.depth = depth
 
         this.gl = canvas.getContext('webgl2', attributes)
         if (!this.gl) console.error('WebGL2 not supported')
 
         // attach renderer to gl so all classes have access to internal state functions
         this.gl.renderer = this
-
-        this.dpr = dpr
 
         // initialize size values
         this.setSize(width, height)
@@ -33,8 +41,14 @@ export class Renderer {
     render({ scene, update = true }) {
         this.setViewport(this.width * this.dpr, this.height * this.dpr)
 
+        // ensure depth buffer writing is enabled so it can be cleared
+        if (this.depth) {
+            this.gl.enable(this.gl.DEPTH_TEST)
+            this.gl.depthMask(true)
+        }
+
         this.gl.clearColor(0.0, 0.0, 0.0, 1.0)
-        this.gl.clear(this.gl.COLOR_BUFFER_BIT)
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT | (this.depth ? this.gl.DEPTH_BUFFER_BIT : 0))
 
         // updates all scene graph matrices
         if (update) scene.updateMatrixWorld()

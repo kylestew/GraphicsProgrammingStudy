@@ -24,22 +24,30 @@ const program = new Program(gl, {
     fragment: fragmentSource,
 })
 
-// basic 1x1 plane
-const geometry = new Plane(gl)
-const mesh = new Mesh(gl, { geometry, program })
+// == GEOMETRY ==
+// define two planes and make them intersect so we can test depth buffering
+const planeA = new Plane(gl)
+const meshA = new Mesh(gl, { geometry: planeA, program })
 
-// TODO: second plane
-//...
+const planeB = new Plane(gl)
+const meshB = new Mesh(gl, { geometry: planeB, program })
 
 function render(now) {
     let time = now * 0.001 // in milliseconds
 
-    let modelMatrix = new Mat4()
-    //     // modelMatrix.translate([0.1, 0.0, 0.0])
-    //     // mat4.rotate(modelMatrix, modelMatrix, time, [1.0, 0.666, 0.333])
-    program.setUniform('uModelMatrix', modelMatrix)
+    let modelMatrixA = new Mat4()
+    modelMatrixA.translate([0.2, 0.2, 0.0])
+    program.setUniform('uModelMatrix', modelMatrixA)
 
-    renderer.render({ scene: mesh })
-    requestAnimationFrame(render)
+    // first mesh rendered in rendering call
+    renderer.render({ scene: meshA })
+
+    let modelMatrixB = new Mat4()
+    modelMatrixB.translate([-0.2, -0.2, -0.2]) // move in front (z negative towards screen)
+    program.setUniform('uModelMatrix', modelMatrixB)
+
+    meshB.draw()
+
+    // requestAnimationFrame(render)
 }
 requestAnimationFrame(render)
