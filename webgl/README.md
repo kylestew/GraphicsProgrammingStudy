@@ -18,9 +18,25 @@ Using transformation matrices, a piece of geometry is rotated, scaled, and trans
 
 https://learnopengl.com/Getting-started/Transformations
 
-## 04-Cameras
+## 04-Coordinate Systems
 
 NDC and coordinate systems
+Transforming from model space, to world space, to view space (camera), to clip space, then to screen space.
+
+### Projection
+
+https://www.scratchapixel.com/lessons/3d-basic-rendering/perspective-and-orthographic-projection-matrix/opengl-perspective-projection-matrix.html
+
+To transform vertex coordinates from view to clip-space we define a so called projection matrix that specifies a range of coordinates e.g. -1000 and 1000 in each dimension. The projection matrix then converts coordinates within this specified range to normalized device coordinates (-1.0, 1.0) (not directly, a step called Perspective Division sits in between). All coordinates outside this range will not be mapped between -1.0 and 1.0 and therefore be clipped. With this range we specified in the projection matrix, a coordinate of (1250, 500, 750) would not be visible, since the x coordinate is out of range and thus gets converted to a coordinate higher than 1.0 in NDC and is therefore clipped.
+
+Note that if only a part of a primitive e.g. a triangle is outside the clipping volume OpenGL will reconstruct the triangle as one or more triangles to fit inside the clipping range.
+This viewing box a projection matrix creates is called a frustum and each coordinate that ends up inside this frustum will end up on the user's screen. The total process to convert coordinates within a specified range to NDC that can easily be mapped to 2D view-space coordinates is called projection since the projection matrix projects 3D coordinates to the easy-to-map-to-2D normalized device coordinates.
+
+### 3D
+
+Need to enable z-buffer depth test
+
+
 
 https://webgl2fundamentals.org/webgl/lessons/webgl-3d-perspective.html
 https://webgl2fundamentals.org/webgl/lessons/webgl-3d-camera.html

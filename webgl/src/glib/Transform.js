@@ -10,7 +10,7 @@ export class Transform {
     }
 
     updateMatrixWorld() {
-        console.log('World matrix updating')
+        // console.log('World matrix updating')
     }
 
     updateMatrix() {}
