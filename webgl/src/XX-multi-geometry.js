@@ -4,12 +4,13 @@ import { Plane } from './glib/extras/Plane.js'
 import { Mesh } from './glib/Mesh.js'
 import { Mat4 } from './glib/math/Mat4.js'
 
-import vertexSource from './shaders/uv_colored.vert?raw'
-import fragmentSource from './shaders/uv_colored.frag?raw'
+import vertexSource from './shaders/vertex_colored.vert?raw'
+import fragmentSource from './shaders/vertex_colored.frag?raw'
 
 const canvas = document.getElementById('gl-canvas')
 const renderer = new Renderer({
     canvas: canvas,
+    depth: true,
 })
 const gl = renderer.gl
 
@@ -26,24 +27,55 @@ const program = new Program(gl, {
 
 // == GEOMETRY ==
 // define two planes and make them intersect so we can test depth buffering
-const planeA = new Plane(gl, { widthSegments: 2, heightSegments: 2 })
+// prettier-ignore
+const colorRed = new Float32Array([
+    1.0, 0.0, 0.0, 1.0,
+    1.0, 0.0, 0.0, 1.0,
+    1.0, 0.0, 0.0, 1.0,
+    1.0, 0.0, 0.0, 1.0,
+])
+const planeA = new Plane(gl, {
+    width: 0.5,
+    height: 0.5,
+    depth: 0.0,
+    attributes: {
+        color: { size: 4, data: colorRed },
+    },
+})
 const meshA = new Mesh(gl, { geometry: planeA, program })
 
-const planeB = new Plane(gl)
+// prettier-ignore
+const colorGreen = new Float32Array([
+    0.0, 1.0, 0.0, 1.0,
+    0.0, 1.0, 0.0, 1.0,
+    0.0, 1.0, 0.0, 1.0,
+    0.0, 1.0, 0.0, 1.0,
+])
+const planeB = new Plane(gl, {
+    width: 1.0,
+    height: 1.0,
+    depth: 0.0,
+    attributes: {
+        color: { size: 4, data: colorGreen },
+    },
+})
 const meshB = new Mesh(gl, { geometry: planeB, program })
 
 function render(now) {
     let time = now * 0.001 // in milliseconds
 
     let modelMatrixA = new Mat4()
-    modelMatrixA.translate([0.2, 0.2, 0.0])
+    modelMatrixA.translate([0.0, 0.0, 0.0])
     program.setUniform('uModelMatrix', modelMatrixA)
 
     // first mesh rendered in rendering call
     renderer.render({ scene: meshA })
 
+    // green plane (move forward)
     let modelMatrixB = new Mat4()
-    modelMatrixB.translate([-0.2, -0.2, -0.2]) // move in front (z negative towards screen)
+    // NDC coordinates are Left Handed, WebGL is right handed
+    // we are only working in NDC coordinates in this example
+    modelMatrixB.translate([0.0, 0.0, 0.2])
     program.setUniform('uModelMatrix', modelMatrixB)
 
     meshB.draw()

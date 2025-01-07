@@ -1,7 +1,7 @@
 import { Geometry } from '../Geometry'
 
 export class Plane extends Geometry {
-    constructor(gl, { width = 1, height = 1, widthSegments = 1, heightSegments = 1, attributes = {} } = {}) {
+    constructor(gl, { width = 1, height = 1, depth = 0, widthSegments = 1, heightSegments = 1, attributes = {} } = {}) {
         const num = (widthSegments + 1) * (heightSegments + 1)
         const numIndices = widthSegments * heightSegments * 6
 
@@ -10,7 +10,7 @@ export class Plane extends Geometry {
         const uv = new Float32Array(num * 2)
         const index = numIndices > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices)
 
-        Plane.buildPlane(position, normal, uv, index, width, height, 0, widthSegments, heightSegments)
+        Plane.buildPlane(position, normal, uv, index, width, height, depth, widthSegments, heightSegments)
 
         Object.assign(attributes, {
             position: { size: 3, data: position },

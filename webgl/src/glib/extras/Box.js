@@ -30,11 +30,11 @@ export class Box extends Geometry {
         let ii = 0
 
         // left
-        Plane.buildPlane(position, normal, uv, index, depth, height, width, dSegs, hSegs, 2, 1, 0, -1, -1, i, ii)
+        Plane.buildPlane(position, normal, uv, index, depth, height, -width, dSegs, hSegs, 2, 1, 0, 1, -1, i, ii)
         i += numLeftRight
         ii += segCountLeftRight
         // right
-        Plane.buildPlane(position, normal, uv, index, depth, height, -width, dSegs, hSegs, 2, 1, 0, 1, -1, i, ii)
+        Plane.buildPlane(position, normal, uv, index, depth, height, width, dSegs, hSegs, 2, 1, 0, -1, -1, i, ii)
         i += numLeftRight
         ii += segCountLeftRight
 
@@ -48,11 +48,11 @@ export class Box extends Geometry {
         ii += segCountTopBottom
 
         // front
-        Plane.buildPlane(position, normal, uv, index, width, height, -depth, wSegs, hSegs, 0, 1, 2, -1, -1, i, ii)
+        Plane.buildPlane(position, normal, uv, index, width, height, depth, wSegs, hSegs, 0, 1, 2, 1, -1, i, ii)
         i += numFrontBack
         ii += segCountFrontBack
         // back
-        Plane.buildPlane(position, normal, uv, index, width, height, depth, wSegs, hSegs, 0, 1, 2, 1, -1, i, ii)
+        Plane.buildPlane(position, normal, uv, index, width, height, -depth, wSegs, hSegs, 0, 1, 2, -1, -1, i, ii)
 
         Object.assign(attributes, {
             position: { size: 3, data: position },

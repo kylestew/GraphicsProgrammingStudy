@@ -23,6 +23,11 @@ Using transformation matrices, a piece of geometry is rotated, scaled, and trans
 NDC and coordinate systems
 Transforming from model space, to world space, to view space (camera), to clip space, then to screen space.
 
+https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/WebGL_model_view_projection
+
+
+
+
 ### Projection
 
 https://www.scratchapixel.com/lessons/3d-basic-rendering/perspective-and-orthographic-projection-matrix/opengl-perspective-projection-matrix.html
