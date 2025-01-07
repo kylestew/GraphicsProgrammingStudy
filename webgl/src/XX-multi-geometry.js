@@ -26,7 +26,7 @@ const program = new Program(gl, {
 
 // == GEOMETRY ==
 // define two planes and make them intersect so we can test depth buffering
-const planeA = new Plane(gl)
+const planeA = new Plane(gl, { widthSegments: 2, heightSegments: 2 })
 const meshA = new Mesh(gl, { geometry: planeA, program })
 
 const planeB = new Plane(gl)

@@ -16,7 +16,7 @@ This example rebuilds the previous example using our custom framework
 
 Using transformation matrices, a piece of geometry is rotated, scaled, and translated in 3D.
 
-https://learnopengl.com/Getting-started/Transformations
+* https://learnopengl.com/Getting-started/Transformations
 
 ## 04-Coordinate Systems
 
@@ -33,8 +33,6 @@ Note that if only a part of a primitive e.g. a triangle is outside the clipping 
 This viewing box a projection matrix creates is called a frustum and each coordinate that ends up inside this frustum will end up on the user's screen. The total process to convert coordinates within a specified range to NDC that can easily be mapped to 2D view-space coordinates is called projection since the projection matrix projects 3D coordinates to the easy-to-map-to-2D normalized device coordinates.
 
 ### 3D
-
-Need to enable z-buffer depth test
 
 
 https://www.youtube.com/watch?v=gQiD2Kd6xoE&list=PLplnkTzzqsZS3R5DjmCQsqupu43oS9CFN&index=2
