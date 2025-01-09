@@ -5,7 +5,7 @@ import { Geometry } from './glib/Geometry.js'
 import { Mat4 } from './glib/math/Mat4.js'
 
 import vertexSource from './shaders/vertex_color_trans.vert?raw'
-import fragmentSource from './shaders/vertex_color.frag?raw'
+import fragmentSource from './shaders/vertex_colored.frag?raw'
 
 const canvas = document.getElementById('gl-canvas')
 const renderer = new Renderer({
@@ -48,7 +48,7 @@ const colors = new Float32Array([
 ])
 const geometry = new Geometry(gl, {
     position: { size: 3, data: positions },
-    aColor: { size: 4, data: colors },
+    color: { size: 4, data: colors },
 })
 const mesh = new Mesh(gl, { geometry, program })
 
