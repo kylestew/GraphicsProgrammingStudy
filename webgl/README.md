@@ -18,17 +18,16 @@ Using transformation matrices, a piece of geometry is rotated, scaled, and trans
 
 * https://learnopengl.com/Getting-started/Transformations
 
-## 04-Coordinate Systems
+## 04-3D
 
 NDC and coordinate systems
 Transforming from model space, to world space, to view space (camera), to clip space, then to screen space.
 
 https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/WebGL_model_view_projection
 
-
-
-
 ### Projection
+
+https://ogldev.org/www/tutorial12/tutorial12.html
 
 https://www.scratchapixel.com/lessons/3d-basic-rendering/perspective-and-orthographic-projection-matrix/opengl-perspective-projection-matrix.html
 
@@ -37,14 +36,16 @@ To transform vertex coordinates from view to clip-space we define a so called pr
 Note that if only a part of a primitive e.g. a triangle is outside the clipping volume OpenGL will reconstruct the triangle as one or more triangles to fit inside the clipping range.
 This viewing box a projection matrix creates is called a frustum and each coordinate that ends up inside this frustum will end up on the user's screen. The total process to convert coordinates within a specified range to NDC that can easily be mapped to 2D view-space coordinates is called projection since the projection matrix projects 3D coordinates to the easy-to-map-to-2D normalized device coordinates.
 
-### 3D
-
-
 https://www.youtube.com/watch?v=gQiD2Kd6xoE&list=PLplnkTzzqsZS3R5DjmCQsqupu43oS9CFN&index=2
-
 
 https://webgl2fundamentals.org/webgl/lessons/webgl-3d-perspective.html
 https://webgl2fundamentals.org/webgl/lessons/webgl-3d-camera.html
 
 https://learnopengl.com/Getting-started/Coordinate-Systems
 https://learnopengl.com/Getting-started/Camera
+
+
+## 05-Camera
+...
+
+https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/WebGL_model_view_projection#view_matrix

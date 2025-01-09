@@ -93,8 +93,8 @@ canvas.addEventListener('mousemove', (event) => {
     if (isDragging) {
         const deltaX = event.clientX - lastMouseX
         const deltaY = event.clientY - lastMouseY
-        rotationY -= deltaX * 0.005 // Adjust sensitivity as needed
-        rotationX -= deltaY * 0.005
+        rotationY += deltaX * 0.005 // Adjust sensitivity as needed
+        rotationX += deltaY * 0.005
         lastMouseX = event.clientX
         lastMouseY = event.clientY
     }
@@ -109,21 +109,23 @@ canvas.addEventListener('mouseleave', () => {
 })
 
 function render(now) {
-    // let time = now * 0.001 // in milliseconds
-
     // prettier-ignore
     let modelMatrix = new Mat4()
-    // modelMatrix.translate([0.1, 0.0, 0.0])
+    modelMatrix.translate([0.0, 0.0, -3.0]) // move away from the camera
+    // modelMatrix.scale([0.25, 0.25, 0.25])
     modelMatrix.rotate(rotationX, [1.0, 0.0, 0.0])
     modelMatrix.rotate(rotationY, [0.0, 1.0, 0.0])
-
-    // map to NDC coordinates by mirroring
-    // WHY DOESN'T WebGL match NDC coords!?
-    modelMatrix.scale([1, 1, -1])
-
     program.setUniform('uModelMatrix', modelMatrix)
 
-    // TODO: projection matrix!
+    // Projection Matrix
+    // just remake it each time with aspect ratio
+    // this.projectionMatrix.fromPerspective({ fov: fov * (Math.PI / 180), aspect, near, far });
+    let fov = Math.PI / 4 // 45 degrees
+    let aspect = gl.canvas.width / gl.canvas.height
+    let near = 0.1
+    let far = 100
+    const perspectiveMatrix = Mat4.perspective(fov, aspect, near, far)
+    program.setUniform('uProjectionMatrix', perspectiveMatrix)
 
     renderer.render({ scene: mesh })
     requestAnimationFrame(render)

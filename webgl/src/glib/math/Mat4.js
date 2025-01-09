@@ -37,4 +37,8 @@ export class Mat4 extends Array {
         Mat4Func.scale(this, m, typeof v === 'number' ? [v, v, v] : v)
         return this
     }
+
+    static perspective(fov, aspect, near, far) {
+        return Mat4Func.perspective(new Mat4(), fov, aspect, near, far)
+    }
 }

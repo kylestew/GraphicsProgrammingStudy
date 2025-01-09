@@ -6,10 +6,11 @@ in vec2 uv;
 in vec4 color;
 
 uniform mat4 uModelMatrix;
+uniform mat4 uProjectionMatrix;
 
 out vec4 v_color;
 
 void main() {
-    gl_Position = uModelMatrix * vec4(position, 1.0);
+    gl_Position = uProjectionMatrix * uModelMatrix * vec4(position, 1.0);
     v_color     = color;
 }
