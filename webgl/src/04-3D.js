@@ -4,7 +4,23 @@ import { Mesh } from './glib/Mesh.js'
 import { Box } from './glib/extras/Box.js'
 import { Mat4 } from './glib/math/Mat4.js'
 
-import vertexSource from './shaders/vertex_colored.vert?raw'
+const vertexSource = `#version 300 es
+
+in vec3 position;
+in vec3 normal;
+in vec2 uv;
+in vec4 color;
+
+uniform mat4 uModelMatrix;
+uniform mat4 uProjectionMatrix;
+
+out vec4 v_color;
+
+void main() {
+    gl_Position = uProjectionMatrix * uModelMatrix * vec4(position, 1.0);
+    v_color     = color;
+}
+`
 import fragmentSource from './shaders/vertex_colored.frag?raw'
 
 const canvas = document.getElementById('gl-canvas')
@@ -14,14 +30,11 @@ const renderer = new Renderer({
 const gl = renderer.gl
 
 // Enable face culling
-gl.enable(gl.CULL_FACE)
-
-// Specify that back faces should be culled
-gl.cullFace(gl.BACK)
-
-// (Optional) Set the front face winding order
-// By default, WebGL considers counter-clockwise (CCW) winding as front-facing
-gl.frontFace(gl.CCW)
+renderer.setFaceCulling({
+    enabled: true,
+    face: gl.BACK,
+    frontFace: gl.CCW,
+})
 
 function resize() {
     renderer.setSize(canvas.clientWidth, canvas.clientHeight)
@@ -75,46 +88,19 @@ const box = new Box(gl, {
 })
 const mesh = new Mesh(gl, { geometry: box, program })
 
-// Variables for mouse tracking
 let rotationY = 0
 let rotationX = 0
-let isDragging = false
-let lastMouseX = 0
-let lastMouseY = 0
-
-// Mouse event listeners
-canvas.addEventListener('mousedown', (event) => {
-    isDragging = true
-    lastMouseX = event.clientX
-    lastMouseY = event.clientY
-})
-
-canvas.addEventListener('mousemove', (event) => {
-    if (isDragging) {
-        const deltaX = event.clientX - lastMouseX
-        const deltaY = event.clientY - lastMouseY
-        rotationY += deltaX * 0.005 // Adjust sensitivity as needed
-        rotationX += deltaY * 0.005
-        lastMouseX = event.clientX
-        lastMouseY = event.clientY
-    }
-})
-
-canvas.addEventListener('mouseup', () => {
-    isDragging = false
-})
-
-canvas.addEventListener('mouseleave', () => {
-    isDragging = false
-})
-
+let rotationZ = 0
 function render(now) {
-    // prettier-ignore
+    rotationX += 0.01
+    rotationY += 0.005
+    rotationZ += 0.008
+
     let modelMatrix = new Mat4()
-    modelMatrix.translate([0.0, 0.0, -3.0]) // move away from the camera
-    // modelMatrix.scale([0.25, 0.25, 0.25])
+    modelMatrix.translate([0.0, 0.0, -3.0]) // move away from the fake camera
     modelMatrix.rotate(rotationX, [1.0, 0.0, 0.0])
     modelMatrix.rotate(rotationY, [0.0, 1.0, 0.0])
+    modelMatrix.rotate(rotationZ, [0.0, 0.0, 1.0])
     program.setUniform('uModelMatrix', modelMatrix)
 
     // Projection Matrix

@@ -38,6 +38,24 @@ export class Renderer {
         this.gl.viewport(0, 0, width, height)
     }
 
+    setFaceCulling({ enabled = true, face = null, frontFace = null } = {}) {
+        if (enabled) {
+            this.gl.enable(this.gl.CULL_FACE)
+
+            // Set which face to cull if specified
+            if (face) {
+                this.gl.cullFace(face)
+            }
+
+            // Set front face winding order if specified
+            if (frontFace) {
+                this.gl.frontFace(frontFace)
+            }
+        } else {
+            this.gl.disable(this.gl.CULL_FACE)
+        }
+    }
+
     render({ scene, update = true }) {
         this.setViewport(this.width * this.dpr, this.height * this.dpr)
 
