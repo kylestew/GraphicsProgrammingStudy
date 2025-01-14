@@ -4,8 +4,32 @@
 
 #include <iostream>
 
+double hit_sphere(const point3 &center, double radius, const ray &r) {
+    vec3 oc           = center - r.origin();
+    auto a            = r.direction().length_squared();
+    auto h            = dot(r.direction(), oc);
+    auto c            = oc.length_squared() - radius * radius;
+    auto discriminant = h * h - a * c;
+    if (discriminant < 0)
+        return -1;
+    else
+        // return the closer of the two solutions (should be the entry point of the ray into the sphere?)
+        return (h - std::sqrt(discriminant)) / a;
+}
+
 color ray_color(const ray &r) {
-    // gradiant sky
+    point3 sphere_center(0, 0, -1);
+    // t is the distance along the ray to the hit point
+    auto t = hit_sphere(point3(0, 0, -1), 0.5, r);
+    if (t > 0.0) {
+        // N is the surface normal at the hit point, found by taking the vector from
+        // the sphere's center to the hit point (r.at(t) - sphere_center).
+        // This gives us the direction the surface is facing at that point.
+        vec3 N = unit_vector(r.at(t) - sphere_center);
+        return 0.5 * color(N.x() + 1, N.y() + 1, N.z() + 1);
+    }
+
+    // gradient sky
     auto a = 0.5 * r.direction().y() + 0.5;
     return (1 - a) * color(1.0, 1.0, 1.0) + a * color(0.5, 0.7, 1.0);
 }
