@@ -91,13 +91,15 @@ class camera {
 
         // drop any rays that don't fully align with the surface (0.001)
         if (world.hit(r, interval(0.001, infinity), rec)) {
-            // query material for scattering
+            // query material to know how the ray should scatter after hitting the surface
             ray scattered;
             color attenuation;
             if (rec.mat->scatter(r, rec, attenuation, scattered)) {
+                // multiplies up all color values from all rays
                 return attenuation * ray_color(scattered, depth - 1, world);
             }
-            // not sure why it would fail
+            // not sure why it would fail to scatter (no material?)
+            // this completly absorbs the ray
             return color(0, 0, 0);
 
             // (interesting failure)
