@@ -5,9 +5,10 @@
 
 class camera {
   public:
-    double aspect_ratio   = 1.0;
-    int image_width       = 100;
-    int samples_per_pixel = 10;
+    double aspect_ratio   = 1.0; // ration of image width to height
+    int image_width       = 100; // rendered image width in pixel count
+    int samples_per_pixel = 10;  // number of samples per pixel
+    int max_depth         = 10;  // max depth of ray bounces
 
     void render(const hittable &world) {
         initialize();
@@ -20,7 +21,7 @@ class camera {
                 color pixel_color(0, 0, 0);
                 for (int s = 0; s < samples_per_pixel; s++) {
                     ray r = get_ray(i, j);
-                    pixel_color += ray_color(r, world);
+                    pixel_color += ray_color(r, max_depth, world);
                 }
                 write_color(std::cout, pixel_samples_scale * pixel_color);
             }
@@ -80,10 +81,30 @@ class camera {
         return vec3(random_double() - 0.5, random_double() - 0.5, 0);
     }
 
-    color ray_color(const ray &r, const hittable &world) {
+    color ray_color(const ray &r, int depth, const hittable &world) {
+        // if we've exceeded the ray bounce limit, no more light is gathered
+        if (depth <= 0)
+            return color(0, 0, 0);
+
         hit_record rec;
-        if (world.hit(r, interval(0, infinity), rec)) {
-            return 0.5 * (rec.normal + color(1, 1, 1));
+
+        // drop any rays that don't fully align with the surface
+        if (world.hit(r, interval(0.001, infinity), rec)) {
+            // (interesting failure)
+            // vec3 s = rec.p + rec.normal + random_unit_vector();
+            // return 0.5 * ray_color(ray(rec.p, s), depth - 1, world);
+
+            // == lambertian reflection ==
+            vec3 direction = rec.normal + random_unit_vector();
+            return 0.5 * ray_color(ray(rec.p, direction), depth - 1, world);
+
+            // == diffuse reflection bounce ==
+            // vec3 direction = random_on_hemisphere(rec.normal);
+            // return 0.5 * ray_color(ray(rec.p, s), depth - 1, world);
+
+            // == return normal as color ==
+            // vector can range values -1 to 1, so scale to 0 to 1 by adding 1 and dividing by 2
+            // return 0.5 * (rec.normal + color(1, 1, 1));
         }
 
         // gradient sky

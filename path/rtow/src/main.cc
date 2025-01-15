@@ -12,8 +12,9 @@ int main() {
     camera cam;
 
     cam.aspect_ratio      = 16.0 / 9.0;
-    cam.image_width       = 400;
-    cam.samples_per_pixel = 100;
+    cam.image_width       = 1200;
+    cam.samples_per_pixel = 200;
+    cam.max_depth         = 50;
 
     cam.render(world);
 
