@@ -2,6 +2,7 @@
 #define CAMERA_H
 
 #include "hittable.h"
+#include "material.h"
 
 class camera {
   public:
@@ -88,15 +89,24 @@ class camera {
 
         hit_record rec;
 
-        // drop any rays that don't fully align with the surface
+        // drop any rays that don't fully align with the surface (0.001)
         if (world.hit(r, interval(0.001, infinity), rec)) {
+            // query material for scattering
+            ray scattered;
+            color attenuation;
+            if (rec.mat->scatter(r, rec, attenuation, scattered)) {
+                return attenuation * ray_color(scattered, depth - 1, world);
+            }
+            // not sure why it would fail
+            return color(0, 0, 0);
+
             // (interesting failure)
             // vec3 s = rec.p + rec.normal + random_unit_vector();
             // return 0.5 * ray_color(ray(rec.p, s), depth - 1, world);
 
             // == lambertian reflection ==
-            vec3 direction = rec.normal + random_unit_vector();
-            return 0.5 * ray_color(ray(rec.p, direction), depth - 1, world);
+            // vec3 direction = rec.normal + random_unit_vector();
+            // return 0.5 * ray_color(ray(rec.p, direction), depth - 1, world);
 
             // == diffuse reflection bounce ==
             // vec3 direction = random_on_hemisphere(rec.normal);
