@@ -98,8 +98,7 @@ class camera {
                 // multiplies up all color values from all rays
                 return attenuation * ray_color(scattered, depth - 1, world);
             }
-            // not sure why it would fail to scatter (no material?)
-            // this completly absorbs the ray
+            // if scatter returns false, the ray is absorbed
             return color(0, 0, 0);
 
             // (interesting failure)

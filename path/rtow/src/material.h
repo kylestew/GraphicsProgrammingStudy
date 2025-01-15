@@ -30,18 +30,23 @@ class lambertian : public material {
 
 class metal : public material {
   public:
-    metal(const color &albedo) : albedo(albedo) {}
+    metal(const color &albedo, double fuzz) : albedo(albedo), fuzz(fuzz) {}
 
     bool scatter(const ray &r_in, const hit_record &rec, color &attenuation, ray &scattered) const override {
         // simple reflection
         vec3 reflected = reflect(r_in.direction(), rec.normal);
-        scattered      = ray(rec.p, reflected);
-        attenuation    = albedo;
-        return true;
+        // add fuzz to the reflected ray by moving its direction slightly (by a smaller random unit vector)
+        reflected   = unit_vector(reflected) + (fuzz * random_unit_vector());
+        scattered   = ray(rec.p, reflected);
+        attenuation = albedo;
+
+        // if the ray goes back into the object, absorb it (return false)
+        return (dot(scattered.direction(), rec.normal) > 0);
     }
 
   private:
     color albedo;
+    double fuzz;
 };
 
 #endif
