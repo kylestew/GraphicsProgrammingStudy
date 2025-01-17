@@ -4,16 +4,18 @@ import vertexSource from './shaders/basic.vert?raw'
 import fragmentSource from './shaders/basic.frag?raw'
 
 {
-    const renderer = new Renderer()
+    const renderer = new Renderer({
+        antialias: false,
+    })
     const gl = renderer.gl
     document.body.appendChild(gl.canvas)
 
     const camera = new Camera(gl)
-    camera.position.z = 5
+    camera.position.z = 1
 
     // Create controls and pass parameters
     const controls = new Orbit(camera, {
-        target: new Vec3(0, 0.7, 0),
+        target: new Vec3(0, 1.0, 0),
     })
 
     function resize() {
@@ -37,6 +39,7 @@ import fragmentSource from './shaders/basic.frag?raw'
         uniforms: {
             cameraPosition: { value: new Vec3() },
             aspectRatio: { value: gl.canvas.width / gl.canvas.height },
+            time: { value: 0 },
         },
     })
 
@@ -47,16 +50,17 @@ import fragmentSource from './shaders/basic.frag?raw'
     if (successfulCompilation) {
         const mesh = new Mesh(gl, { geometry, program })
 
-        function update() {
+        function update(t) {
             controls.update()
 
             program.uniforms.aspectRatio.value = gl.canvas.width / gl.canvas.height
             program.uniforms.cameraPosition.value.copy(camera.position)
+            program.uniforms.time.value = t * 0.001 // Convert to seconds
 
             renderer.render({ scene: mesh, camera })
             requestAnimationFrame(update)
         }
-        update()
+        update(0)
     } else {
         console.error('Failed to compile shader program')
     }

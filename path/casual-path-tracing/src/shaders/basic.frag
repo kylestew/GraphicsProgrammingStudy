@@ -1,3 +1,5 @@
+#version 300 es
+
 precision highp float;
 
 // === Types ===============================================
@@ -7,7 +9,7 @@ struct Ray {
 };
 
 struct Material {
-    vec4 color;
+    vec3 color;
 };
 
 struct Sphere {
@@ -25,6 +27,33 @@ struct HitInfo {
 };
 // =========================================================
 
+// === Random ==============================================
+float random(vec2 st) { return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123); }
+
+// PCG (permuted congruential generator). Thanks to:
+// www.pcg-random.org and www.shadertoy.com/view/XlGcRh
+uint nextRandom(inout uint state) {
+    state       = state * 747796405u + 2891336453u;
+    uint result = ((state >> ((state >> 28u) + 4u)) ^ state) * 277803737u;
+    result      = (result >> 22u) ^ result;
+    return result;
+}
+
+float randomValue(inout uint state) { return float(nextRandom(state)) / 4294967296.0; }
+
+vec3 randomVectorInUnitSphere(inout uint state) {
+    while (true) {
+        float x  = randomValue(state);
+        float y  = randomValue(state);
+        float z  = randomValue(state);
+        vec3 vec = normalize(vec3(x, y, z));
+        if (dot(vec, vec) < 1.0) {
+            return vec;
+        }
+    }
+}
+// =========================================================
+
 // === Ray Intersections ===================================
 HitInfo RaySphere(Ray ray, vec3 sphereCentre, float sphereRadius) {
     HitInfo hitInfo;
@@ -32,7 +61,7 @@ HitInfo RaySphere(Ray ray, vec3 sphereCentre, float sphereRadius) {
     hitInfo.dist     = 0.0;
     hitInfo.hitPoint = vec3(0.0);
     hitInfo.normal   = vec3(0.0);
-    hitInfo.material = Material(vec4(0.0));
+    hitInfo.material = Material(vec3(0.0));
 
     vec3 offsetRayOrigin = ray.origin - sphereCentre;
     // From the equation: sqrLength(rayOrigin + rayDir * dst) = radius^2
@@ -60,41 +89,97 @@ HitInfo RaySphere(Ray ray, vec3 sphereCentre, float sphereRadius) {
 }
 // =========================================================
 
-vec3 Trace(Ray ray) { return vec3(1.0, 0.0, 1.0); }
+// Test against all spheres
+const int NUM_SPHERES = 4;
+Sphere spheres[NUM_SPHERES];
 
-varying vec2 vUv;
-varying vec3 vCameraPosition;
-varying mat4 vInverseProjectionMatrix;
-varying mat4 vInverseViewMatrix;
+void initSpheres() {
+    spheres[0] = Sphere(vec3(0, 0, 0), 0.5, Material(vec3(0.9, 0.2, 0.2)));
+    spheres[3] = Sphere(vec3(0.0, -100.5, 0.0), 100.0, Material(vec3(0.3, 0.8, 0.8)));
+}
+
+// === Ray Tracing =========================================
+// Find the first point that the given ray collides with, and return hit info
+HitInfo CalculateRayCollision(Ray ray) {
+    // empty hit info initialisation
+    HitInfo closestHit;
+    closestHit.didHit   = false;
+    closestHit.dist     = 1e20; // large finite value
+    closestHit.hitPoint = vec3(0.0);
+    closestHit.normal   = vec3(0.0);
+    closestHit.material = Material(vec3(0.0));
+
+    // check each sphere in the scene to see which is closest
+    for (int i = 0; i < NUM_SPHERES; i++) {
+        Sphere sphere   = spheres[i];
+        HitInfo hitInfo = RaySphere(ray, sphere.position, sphere.radius);
+
+        if (hitInfo.didHit && hitInfo.dist < closestHit.dist) {
+            closestHit          = hitInfo;
+            closestHit.material = sphere.material;
+        }
+    }
+
+    return closestHit;
+}
+
+// Trace the path of a ray of light (in reverse) as it travels from the camera,
+// reflects off objects in the scene, and ends up (hopefully) at a light source.
+
+const int MAX_BOUNCES = 10;
+
+vec3 Trace(Ray ray, uint seed) {
+    vec3 incomingLight = vec3(0.0);
+    vec3 rayColor      = vec3(1.0);
+
+    for (int i = 0; i < MAX_BOUNCES; i++) {
+        // find the first thing the ray collides with
+        HitInfo hitInfo = CalculateRayCollision(ray);
+
+        if (hitInfo.didHit) {
+            rayColor *= hitInfo.material.color;
+
+            // == diffuse shading ==
+            // from the endpoint of the normal, find a random vector in the unit sphere
+            // shoot a new ray from the hit point towards the random vector
+            ray.origin = hitInfo.hitPoint;
+            ray.dir    = hitInfo.normal + randomVectorInUnitSphere(seed);
+        } else {
+            break;
+        }
+    }
+
+    return rayColor;
+    // return incomingLight;
+}
+// =========================================================
+
+uniform float time;
+
+in vec2 vUv;
+in vec3 vCameraPosition;
+
+out vec4 fragColor;
 
 void main() {
-    Ray ray;
-    ray.origin = vCameraPosition;
+    initSpheres();
+
+    // Create a random seed from screen position and time
+    uint seed = uint(random(vUv + time) * 4294967296.0);
 
     // Calculate ray direction
     vec3 forward = normalize(-vCameraPosition);
     vec3 right   = normalize(cross(forward, vec3(0, 1, 0)));
     vec3 up      = cross(forward, right);
 
-    ray.dir = normalize(forward + right * vUv.x - up * vUv.y);
+    Ray ray;
+    ray.origin = vCameraPosition;
+    ray.dir    = normalize(forward + right * vUv.x - up * vUv.y);
 
-    // Test against all spheres
-    HitInfo hitInfo1 = RaySphere(ray, vec3(-1.0, 0.0, 0.0), 0.5);
-    HitInfo hitInfo2 = RaySphere(ray, vec3(1.0, 0.0, 0.0), 0.5);
-    HitInfo hitInfo3 = RaySphere(ray, vec3(0.0, 0.0, -2.0), 2.0); // Big sphere in background
+    vec3 pixelCol = Trace(ray, seed);
+    fragColor     = vec4(pixelCol, 1.0);
 
-    vec3 color;
-    // Check which sphere was hit first (closest to camera)
-    if (hitInfo1.didHit && (!hitInfo2.didHit || hitInfo1.dist < hitInfo2.dist) &&
-        (!hitInfo3.didHit || hitInfo1.dist < hitInfo3.dist)) {
-        color = hitInfo1.normal;
-    } else if (hitInfo2.didHit && (!hitInfo3.didHit || hitInfo2.dist < hitInfo3.dist)) {
-        color = hitInfo2.normal;
-    } else if (hitInfo3.didHit) {
-        color = hitInfo3.normal * vec3(1.0, 0.5, 0.2); // Give it an orange tint
-    } else {
-        color = vec3(0.0, 0.0, 1.0);
-    }
-
-    gl_FragColor = vec4(color, 1.0);
+    // TODO: good random unit vector here
+    // vec3 vec  = randomUnitVector(seed);
+    // fragColor = vec4(vec, 1.0);
 }
