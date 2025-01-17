@@ -1,4 +1,4 @@
-import { Renderer, Geometry, Program, Mesh, Camera } from 'ogl'
+import { Renderer, Geometry, Program, Mesh, Camera, Vec3, Mat4, Orbit } from 'ogl'
 
 import vertexSource from './shaders/basic.vert?raw'
 import fragmentSource from './shaders/basic.frag?raw'
@@ -8,14 +8,19 @@ import fragmentSource from './shaders/basic.frag?raw'
     const gl = renderer.gl
     document.body.appendChild(gl.canvas)
 
-    // const camera = new Camera(gl)
-    // camera.position.z = 5
+    const camera = new Camera(gl)
+    camera.position.z = 5
+
+    // Create controls and pass parameters
+    const controls = new Orbit(camera, {
+        target: new Vec3(0, 0.7, 0),
+    })
 
     function resize() {
         renderer.setSize(window.innerWidth, window.innerHeight)
-        // camera.perspective({
-        //     aspect: gl.canvas.width / gl.canvas.height,
-        // })
+        camera.perspective({
+            aspect: gl.canvas.width / gl.canvas.height,
+        })
     }
     window.addEventListener('resize', resize, false)
     resize()
@@ -30,7 +35,8 @@ import fragmentSource from './shaders/basic.frag?raw'
         vertex: vertexSource,
         fragment: fragmentSource,
         uniforms: {
-            uAspect: { value: gl.canvas.width / gl.canvas.height },
+            cameraPosition: { value: new Vec3() },
+            aspectRatio: { value: gl.canvas.width / gl.canvas.height },
         },
     })
 
@@ -41,16 +47,16 @@ import fragmentSource from './shaders/basic.frag?raw'
     if (successfulCompilation) {
         const mesh = new Mesh(gl, { geometry, program })
 
-        function update(t) {
+        function update() {
+            controls.update()
+
+            program.uniforms.aspectRatio.value = gl.canvas.width / gl.canvas.height
+            program.uniforms.cameraPosition.value.copy(camera.position)
+
+            renderer.render({ scene: mesh, camera })
             requestAnimationFrame(update)
-
-            const aspect = gl.canvas.width / gl.canvas.height
-            program.uniforms.uAspect.value = aspect
-
-            // renderer.render({ scene: mesh, camera })
-            renderer.render({ scene: mesh })
         }
-        requestAnimationFrame(update)
+        update()
     } else {
         console.error('Failed to compile shader program')
     }

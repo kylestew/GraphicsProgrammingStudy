@@ -63,26 +63,38 @@ HitInfo RaySphere(Ray ray, vec3 sphereCentre, float sphereRadius) {
 vec3 Trace(Ray ray) { return vec3(1.0, 0.0, 1.0); }
 
 varying vec2 vUv;
+varying vec3 vCameraPosition;
+varying mat4 vInverseProjectionMatrix;
+varying mat4 vInverseViewMatrix;
 
 void main() {
-    // the ray starts at the camera position (the origin)
     Ray ray;
-    // TODO: bring in camera position
-    ray.origin = vec3(0.0, 0.0, -3.0);
+    ray.origin = vCameraPosition;
 
-    // calculate coordinsates of the ray target on the imaginary pixel plane
-    // -1 to +1 on x, y axis. 1 unit away on the z axis
-    vec3 rayTarget = vec3(vUv, 1.0);
+    // Calculate ray direction
+    vec3 forward = normalize(-vCameraPosition);
+    vec3 right   = normalize(cross(forward, vec3(0, 1, 0)));
+    vec3 up      = cross(forward, right);
 
-    // calculate a normalized vector for the ray direction.
-    // it's pointing from the ray position to the ray target
-    ray.dir = normalize(rayTarget - ray.origin);
+    ray.dir = normalize(forward + right * vUv.x - up * vUv.y);
 
-    // raytrace for this pixel
-    // vec3 color = Trace(ray);
+    // Test against all spheres
+    HitInfo hitInfo1 = RaySphere(ray, vec3(-1.0, 0.0, 0.0), 0.5);
+    HitInfo hitInfo2 = RaySphere(ray, vec3(1.0, 0.0, 0.0), 0.5);
+    HitInfo hitInfo3 = RaySphere(ray, vec3(0.0, 0.0, -2.0), 2.0); // Big sphere in background
 
-    HitInfo hitInfo = RaySphere(ray, vec3(0.0), 0.5);
-    vec3 color      = hitInfo.didHit ? hitInfo.normal : vec3(0.0, 0.0, 1.0);
+    vec3 color;
+    // Check which sphere was hit first (closest to camera)
+    if (hitInfo1.didHit && (!hitInfo2.didHit || hitInfo1.dist < hitInfo2.dist) &&
+        (!hitInfo3.didHit || hitInfo1.dist < hitInfo3.dist)) {
+        color = hitInfo1.normal;
+    } else if (hitInfo2.didHit && (!hitInfo3.didHit || hitInfo2.dist < hitInfo3.dist)) {
+        color = hitInfo2.normal;
+    } else if (hitInfo3.didHit) {
+        color = hitInfo3.normal * vec3(1.0, 0.5, 0.2); // Give it an orange tint
+    } else {
+        color = vec3(0.0, 0.0, 1.0);
+    }
 
     gl_FragColor = vec4(color, 1.0);
 }
