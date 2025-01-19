@@ -35,12 +35,16 @@ class metal : public material {
     bool scatter(const ray &r_in, const hit_record &rec, color &attenuation, ray &scattered) const override {
         // simple reflection
         vec3 reflected = reflect(r_in.direction(), rec.normal);
+
         // add fuzz to the reflected ray by moving its direction slightly (by a smaller random unit vector)
-        reflected   = unit_vector(reflected) + (fuzz * random_unit_vector());
+        // size of random sphere determines amount of "fuzz"
+        // (make reflected ray normalized so the fuzz param is always relative)
+        reflected = unit_vector(reflected) + (fuzz * random_unit_vector());
+
         scattered   = ray(rec.p, reflected);
         attenuation = albedo;
 
-        // if the ray goes back into the object, absorb it (return false)
+        // if the ray goes back into the object, simply absorb it (return false)
         return (dot(scattered.direction(), rec.normal) > 0);
     }
 
@@ -58,23 +62,14 @@ class dielectric : public material {
         double ri   = rec.front_face ? (1.0 / refraction_index) : refraction_index;
 
         vec3 unit_direction = unit_vector(r_in.direction());
-        double cos_theta    = std::fmin(dot(-unit_direction, rec.normal), 1.0);
-        double sin_theta    = std::sqrt(1.0 - cos_theta * cos_theta);
+        vec3 refracted      = refract(unit_direction, rec.normal, ri);
 
-        bool cannot_refract = ri * sin_theta > 1.0;
-        vec3 direction;
-
-        if (cannot_refract)
-            direction = reflect(unit_direction, rec.normal);
-        else
-            direction = refract(unit_direction, rec.normal, ri);
-
-        scattered = ray(rec.p, direction);
+        scattered = ray(rec.p, refracted);
         return true;
     }
 
   private:
-    // refractive index in vacuum or air, or the ratio of the material's refractive index over
+    // Refractive index in vacuum or air, or the ratio of the material's refractive index over
     // the refractive index of the enclosing media
     double refraction_index;
 };

@@ -11,7 +11,7 @@ import fragmentSource from './shaders/basic.frag?raw'
     document.body.appendChild(gl.canvas)
 
     const camera = new Camera(gl)
-    camera.position.z = 1
+    camera.position.z = 2
 
     // Create controls and pass parameters
     const controls = new Orbit(camera, {

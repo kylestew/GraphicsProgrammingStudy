@@ -94,7 +94,9 @@ const int NUM_SPHERES = 4;
 Sphere spheres[NUM_SPHERES];
 
 void initSpheres() {
-    spheres[0] = Sphere(vec3(0, 0, 0), 0.5, Material(vec3(0.9, 0.2, 0.2)));
+    spheres[0] = Sphere(vec3(-1.2, 0, 0), 0.5, Material(vec3(0.9, 0.2, 0.2)));
+    spheres[1] = Sphere(vec3(0, 0, 0), 0.5, Material(vec3(0.9, 0.2, 0.2)));
+    spheres[2] = Sphere(vec3(1.2, 0, 0), 0.5, Material(vec3(0.9, 0.2, 0.2)));
     spheres[3] = Sphere(vec3(0.0, -100.5, 0.0), 100.0, Material(vec3(0.3, 0.8, 0.8)));
 }
 
@@ -143,7 +145,10 @@ vec3 Trace(Ray ray, uint seed) {
             // from the endpoint of the normal, find a random vector in the unit sphere
             // shoot a new ray from the hit point towards the random vector
             ray.origin = hitInfo.hitPoint;
-            ray.dir    = hitInfo.normal + randomVectorInUnitSphere(seed);
+            // ray.dir    = hitInfo.normal + randomVectorInUnitSphere(seed);
+
+            // == metal shading ==
+            ray.dir = reflect(ray.dir, hitInfo.normal);
         } else {
             break;
         }
@@ -178,8 +183,4 @@ void main() {
 
     vec3 pixelCol = Trace(ray, seed);
     fragColor     = vec4(pixelCol, 1.0);
-
-    // TODO: good random unit vector here
-    // vec3 vec  = randomUnitVector(seed);
-    // fragColor = vec4(vec, 1.0);
 }
